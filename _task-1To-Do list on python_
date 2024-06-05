@@ -1,0 +1,119 @@
+import os
+
+FILENAME = 'todo_list.txt'
+
+def load_tasks():
+    """Load tasks from a file."""
+    tasks = []
+    if os.path.exists(FILENAME):
+        with open(FILENAME, 'r') as file:
+            for line in file:
+                task, status = line.strip().split('||')
+                tasks.append({'task': task, 'status': status})
+    return tasks
+
+def save_tasks(tasks):
+    """Save tasks to a file."""
+    with open(FILENAME, 'w') as file:
+        for task in tasks:
+            file.write(f"{task['task']}||{task['status']}\n")
+
+def add_task(tasks):
+    """Add a task to the list."""
+    task = input("Enter a new task: ")
+    tasks.append({'task': task, 'status': 'incomplete'})
+    print(f"Task '{task}' added.")
+
+def view_tasks(tasks):
+    """View all tasks."""
+    if tasks:
+        print("\nTo-Do List:")
+        for idx, task in enumerate(tasks, start=1):
+            status = '✔️' if task['status'] == 'complete' else '❌'
+            print(f"{idx}. {task['task']} [{status}]")
+    else:
+        print("No tasks in the to-do list.")
+
+def update_task(tasks):
+    """Update a task in the list."""
+    view_tasks(tasks)
+    if tasks:
+        try:
+            task_num = int(input("Enter the task number to update: "))
+            if 1 <= task_num <= len(tasks):
+                new_task = input("Enter the new task: ")
+                tasks[task_num - 1]['task'] = new_task
+                print(f"Task {task_num} updated to '{new_task}'.")
+            else:
+                print("Invalid task number.")
+        except ValueError:
+            print("Please enter a valid number.")
+
+def delete_task(tasks):
+    """Delete a task from the list."""
+    view_tasks(tasks)
+    if tasks:
+        try:
+            task_num = int(input("Enter the task number to delete: "))
+            if 1 <= task_num <= len(tasks):
+                confirmation = input(f"Are you sure you want to delete task {task_num}? (yes/no): ")
+                if confirmation.lower() == 'yes':
+                    removed_task = tasks.pop(task_num - 1)
+                    print(f"Task '{removed_task['task']}' deleted.")
+                else:
+                    print("Task deletion canceled.")
+            else:
+                print("Invalid task number.")
+        except ValueError:
+            print("Please enter a valid number.")
+
+def toggle_task_status(tasks):
+    """Toggle the completion status of a task."""
+    view_tasks(tasks)
+    if tasks:
+        try:
+            task_num = int(input("Enter the task number to toggle status: "))
+            if 1 <= task_num <= len(tasks):
+                task = tasks[task_num - 1]
+                task['status'] = 'complete' if task['status'] == 'incomplete' else 'incomplete'
+                status = 'complete' if task['status'] == 'complete' else 'incomplete'
+                print(f"Task {task_num} marked as {status}.")
+            else:
+                print("Invalid task number.")
+        except ValueError:
+            print("Please enter a valid number.")
+
+def main():
+    tasks = load_tasks()
+    while True:
+        print("\nTo-Do List Menu")
+        print("1. Add a task")
+        print("2. View tasks")
+        print("3. Update a task")
+        print("4. Delete a task")
+        print("5. Toggle task status")
+        print("6. Exit")
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            add_task(tasks)
+            save_tasks(tasks)
+        elif choice == '2':
+            view_tasks(tasks)
+        elif choice == '3':
+            update_task(tasks)
+            save_tasks(tasks)
+        elif choice == '4':
+            delete_task(tasks)
+            save_tasks(tasks)
+        elif choice == '5':
+            toggle_task_status(tasks)
+            save_tasks(tasks)
+        elif choice == '6':
+            print("Exiting the to-do list application.")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
